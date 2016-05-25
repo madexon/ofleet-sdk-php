@@ -1,0 +1,24 @@
+{
+    "name": "madexon/ofleet-sdk-php",
+    "description": "O-Fleet REST API SDK for PHP",
+    "type": "library",
+    "license": "Apache2",
+    "authors": [
+        {
+            "name": "Madexon",
+            "email": "contact@madexon.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "commerceguys/guzzle-oauth2-plugin": "^2.1"
+    },
+	"require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "OFleet": "lib/"
+        }
+    }
+}
