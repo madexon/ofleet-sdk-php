@@ -133,20 +133,6 @@ class OfleetService
         return $this->sendRequest("/contracts/attribute-values?clientId=$clientId&attributeName=$attributeName");
     }
 
-    public function countRewardPoints($clientId)
-    {
-        $rewardPoints = $this->getBookingsAttributeValues($clientId, 'rewardPoints');
-        $rewardPoints = from($rewardPoints)->sum(function ($rewardPoint) {
-            return intval($rewardPoint);
-        });
-        $usedRewardPoints = $this->getBookingsAttributeValues($clientId, 'usedRewardPoints');
-        $rewardPoints -= from($usedRewardPoints)->sum(function ($rewardPoint) {
-            return intval($rewardPoint);
-        });
-
-        return $rewardPoints;
-    }
-
     public function getBooking($bookingId)
     {
         return $this->sendRequest('/contracts/contract/' . $bookingId);
@@ -185,13 +171,11 @@ class OfleetService
 
     public function saveBooking($booking)
     {
-        $booking = $this->updateBookingAttributes($booking);
         return $this->postData('/contracts/contract/create', $booking);
     }
 
     public function updateBooking($booking)
     {
-        $booking = $this->updateBookingAttributes($booking);
         return $this->postData('/contracts/contract/update', $booking);
     }
 
@@ -260,34 +244,5 @@ class OfleetService
             ]
         ]);
         return $response->json();
-    }
-
-    /**
-     * @param vehicles
-     * @return array
-     */
-    public function countByProperty($vehicles, $prop, $key)
-    {
-        return from($vehicles)->groupBy(function ($v) use ($prop, $key) {
-            return $v[$prop][$key];
-        })->orderByDescending(function ($group) {
-            return count($group);
-        })->select(function ($group) {
-            return count($group);
-        })->toArrayDeep();
-    }
-
-    /**
-     * @param $booking
-     * @return mixed
-     */
-    private function updateBookingAttributes($booking)
-    {
-        $booking = $this->computeContractAmount($booking);
-        if (!$booking["attributes"]) {
-            $booking["attributes"] = array();
-        }
-        $booking["attributes"]["rewardPoints"] = 0.1 * $booking["amount"];
-        return $booking;
     }
 }
