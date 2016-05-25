@@ -7,7 +7,7 @@ __Welcome to O-Fleet PHP SDK__. This repository contains the PHP SDK library for
 Install the library using [composer][1].
 
 ``` bash
-composer require mathiasverraes/money
+composer require madexon/ofleet-sdk-php
 ```
 
 ## License
