@@ -7,7 +7,6 @@ use CommerceGuys\Guzzle\Oauth2\GrantType\RefreshToken;
 use CommerceGuys\Guzzle\Oauth2\Oauth2Subscriber;
 use GuzzleHttp\Client;
 use GuzzleHttp\Post\PostFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -124,9 +123,9 @@ class OfleetService
         return $this->postData('/contracts/compute', $contract);
     }
 
-    public function listBookingsForClient(\AppBundle\Entity\Client $client)
+    public function listBookingsForClient($id)
     {
-        return $this->sendRequest('/contracts/client/' . $client->getServerClient()["id"] . '?size=50');
+        return $this->sendRequest('/contracts/client/' . $id . '?size=50');
     }
 
     public function getBookingsAttributeValues($clientId, $attributeName)
@@ -216,14 +215,14 @@ class OfleetService
         return $this->postData('/clients/client/update', $authenticatedUser);
     }
 
-    public function updateClientDrivingLicense($authenticatedUser, UploadedFile $drivingLicense)
+    public function updateClientDrivingLicense($clientId, $path, $fileName)
     {
-        return $this->uploadFile("/clients/client/" . $authenticatedUser['id'] . "/update/driving-license", "drivingLicense", $drivingLicense);
+        return $this->uploadFile("/clients/client/" . $clientId . "/update/driving-license", "drivingLicense", $path, $fileName);
     }
 
-    public function updateClientIdCard($authenticatedUser, UploadedFile $idCard)
+    public function updateClientIdCard($clientId, $path, $fileName)
     {
-        return $this->uploadFile("/clients/client/" . $authenticatedUser['id'] . "/update/id-card", "idCard", $idCard);
+        return $this->uploadFile("/clients/client/" . $clientId . "/update/id-card", "idCard", $path, $fileName);
     }
 
     public function changePassword($clientId, $passwordUpdate)
@@ -253,11 +252,11 @@ class OfleetService
         return $response->json();
     }
 
-    private function uploadFile($endpoint, $name, UploadedFile $file)
+    private function uploadFile($endpoint, $name, $path, $fileName)
     {
         $response = $this->client->post($this->baseUrl . self::API_VERSION . $endpoint, [
             'body' => [
-                "$name" => new PostFile($name, fopen($file->getPathname(), 'r'), $file->getClientOriginalName())
+                "$name" => new PostFile($name, fopen($path, 'r'), $fileName)
             ]
         ]);
         return $response->json();
